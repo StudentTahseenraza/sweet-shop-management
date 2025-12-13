@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("CUSTOMER")  // Changed from enum to string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  purchases Purchase[]
+  restocks  Restock[]
+
+  @@map("users")
+}
+
+// Removed enum - SQLite doesn't support enums
+
+model Sweet {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  category    String
+  price       Float
+  quantity    Int      @default(0)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchases Purchase[]
+  restocks  Restock[]
+
+  @@map("sweets")
+}
+
+model Purchase {
+  id         String   @id @default(uuid())
+  sweetId    String
+  userId     String
+  quantity   Int
+  totalPrice Float
+  createdAt  DateTime @default(now())
+
+  sweet      Sweet    @relation(fields: [sweetId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("purchases")
+}
+
+model Restock {
+  id        String   @id @default(uuid())
+  sweetId   String
+  userId    String
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  sweet     Sweet    @relation(fields: [sweetId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("restocks")
+}
