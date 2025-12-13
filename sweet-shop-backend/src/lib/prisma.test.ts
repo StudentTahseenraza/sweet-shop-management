@@ -1,4 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 // Create a test-specific Prisma client that uses SQLite
 const createTestPrismaClient = () => {

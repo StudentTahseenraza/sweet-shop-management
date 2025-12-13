@@ -1,4 +1,6 @@
 // Helper to generate appropriate IDs based on environment
+import * as dotenv from 'dotenv';
+dotenv.config();
 export const generateTestId = (): string => {
   // In test environment (SQLite), use UUID
   // In production (MongoDB), would use ObjectID

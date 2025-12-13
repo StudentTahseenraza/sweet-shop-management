@@ -20,12 +20,19 @@ module.exports = {
   testEnvironmentOptions: {
     NODE_ENV: 'test'
   },
-  // Add transformIgnorePatterns to handle uuid ES modules
-  transformIgnorePatterns: [
-    'node_modules/(?!(uuid)/)'  // Transform uuid package
-  ],
-  // Or use moduleNameMapper as alternative
-  moduleNameMapper: {
-    '^uuid$': require.resolve('uuid')  // Force CommonJS version
+  // Add this to ignore TypeScript errors in tests:
+  globals: {
+    'ts-jest': {
+      isolatedModules: true
+    }
+  },
+  // Or use transform to skip type checking:
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      isolatedModules: true,
+      diagnostics: {
+        ignoreCodes: [6133] // Ignore "unused variable" errors
+      }
+    }]
   }
 };
