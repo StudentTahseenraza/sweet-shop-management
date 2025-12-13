@@ -403,14 +403,110 @@ Replace in .env file
 ---------------------------------------------------------------------------------------------------------------
 
 
+Run tests:
+
+    # Run all tests
+    npm test
+    
+    # Run specific test file
+    npm test -- src/tests/auth.test.ts
+    
+    # Run with coverage
+    npm run test:coverage
+    
+    # Watch mode (for development)
+    npm run test:watch
+
+---------------------------------------------------------------------------------------------------------------
+
+7. Test Output Examples
+   
+        Successful Test Output:
+        text
+         PASS  src/tests/auth.test.ts
+          Auth API
+            POST /api/auth/register
+              ✓ should register a new user (45 ms)
+              ✓ should fail with existing email (32 ms)
+            POST /api/auth/login
+              ✓ should login with valid credentials (38 ms)
+              ✓ should fail with invalid credentials (21 ms)
+        
+        Test Suites: 1 passed, 1 total
+        Tests:       4 passed, 4 total
+        Snapshots:   0 total
+        Time:        1.234 s
+
+---------------------------------------------------------------------------------------------------------------
+
+Coverage Report:
+
+        ----------------------|---------|----------|---------|---------|-------------------
+        File                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+        ----------------------|---------|----------|---------|---------|-------------------
+        All files             |   85.42 |    76.92 |   83.33 |   86.36 |
+         src/controllers      |   91.67 |    83.33 |   90.91 |   92.31 |
+          auth.controller.ts  |   91.67 |    83.33 |   90.91 |   92.31 |
+         src/services         |   83.33 |    75.00 |   80.00 |   84.62 |
+          auth.service.ts     |   83.33 |    75.00 |   80.00 |   84.62 |
+        ----------------------|---------|----------|---------|---------|-------------------
+
+---------------------------------------------------------------------------------------------------------------
+
+8. Troubleshooting Test Issues
+
+        If tests fail to run:
+        bash
+        # Clear jest cache
+        npx jest --clearCache
+        
+        # Check TypeScript compilation
+        npx tsc --noEmit
+        
+        # Run with verbose output
+        npm test -- --verbose
+        
+        # Debug specific test
+        npm test -- --testNamePattern="should register" --verbose
+        If Prisma client fails in tests:
+        bash
+        # Generate Prisma client for tests
+        npx prisma generate
+        
+        # Use in-memory database for tests
+        # Update .env.test to use SQLite
+        DATABASE_URL="file:./test.db"
+
+---------------------------------------------------------------------------------------------------------------
+
+10. Quick Test Commands Cheat Sheet
+
+        # Basic commands
+        npm test                    # Run all tests
+        npm run test:watch         # Watch mode
+        npm run test:coverage      # With coverage
+        
+        # Advanced commands
+        npm test -- --testNamePattern="auth"    # Run specific tests
+        npm test -- --coverage --watchAll       # Coverage in watch mode
+        npm test -- --verbose                   # Detailed output
+        npm test -- --detectOpenHandles         # Detect async issues
+        
+        # Clear and reset
+        npx jest --clearCache      # Clear cache
+        rm -rf coverage           # Remove coverage reports
+
+---------------------------------------------------------------------------------------------------------------
+
 Development Guidelines
-Follow TypeScript best practices
 
-Write tests for new features
-
-Update documentation
-
-Follow existing code style
+    Follow TypeScript best practices
+    
+    Write tests for new features
+    
+    Update documentation
+    
+    Follow existing code style
 
 ---------------------------------------------------------------------------------------------------------------
 
@@ -441,4 +537,5 @@ Loyalty program
 Advanced analytics
 
 Multi-vendor support
+
 
