@@ -1,6 +1,5 @@
 import { prisma } from '../../lib/prisma';
 import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 
 // Helper to create test user
 export const createTestUser = async (userData: {
@@ -10,11 +9,9 @@ export const createTestUser = async (userData: {
   role?: string;
 }) => {
   const hashedPassword = await bcrypt.hash(userData.password || 'password123', 10);
-  const userId = uuidv4();
   
   return await prisma.user.create({
     data: {
-      id: userId,
       email: userData.email,
       password: hashedPassword,
       name: userData.name,
@@ -32,11 +29,8 @@ export const createTestSweet = async (sweetData: {
   quantity: number;
   imageUrl?: string;
 }) => {
-  const sweetId = uuidv4();
-  
   return await prisma.sweet.create({
     data: {
-      id: sweetId,
       name: sweetData.name,
       description: sweetData.description || 'Test description',
       category: sweetData.category,
@@ -47,11 +41,11 @@ export const createTestSweet = async (sweetData: {
   });
 };
 
-// Helper to clear all test data
+// Helper to clear all test data (using deleteMany instead of $executeRaw)
 export const clearTestDatabase = async () => {
-  await prisma.$executeRaw`DELETE FROM restocks`;
-  await prisma.$executeRaw`DELETE FROM purchases`;
-  await prisma.$executeRaw`DELETE FROM sweets`;
-  await prisma.$executeRaw`DELETE FROM users`;
-  await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name IN ('users', 'sweets', 'purchases', 'restocks')`;
+  // Clear in correct order to respect foreign key constraints
+  await prisma.restock.deleteMany();
+  await prisma.purchase.deleteMany();
+  await prisma.sweet.deleteMany();
+  await prisma.user.deleteMany();
 };
