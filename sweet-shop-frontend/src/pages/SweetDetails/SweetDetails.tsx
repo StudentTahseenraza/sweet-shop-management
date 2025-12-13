@@ -7,19 +7,22 @@ import SweetForm from '../../components/sweets/SweetForm/SweetForm';
 import { useSweets } from '../../contexts/SweetContext';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { useCart } from '../../contexts/CartContext';
+
 
 const SweetDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getSweetById, purchaseSweet, deleteSweet, refreshSweets } = useSweets();
   const { isAdmin, isAuthenticated } = useAuth();
-  
+
   const [sweet, setSweet] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
+  const [ setPurchasing] = useState(false);
+  const { addToCart, getItemQuantity } = useCart();
 
   useEffect(() => {
     fetchSweet();
@@ -71,6 +74,26 @@ const SweetDetails: React.FC = () => {
       console.error('Delete failed:', error);
       // Error handled in context
     }
+  };
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to cart');
+      navigate('/login');
+      return;
+    }
+
+    addToCart({
+      id: sweet.id,
+      name: sweet.name,
+      price: sweet.price,
+      imageUrl: sweet.imageUrl,
+      category: sweet.category,
+      maxQuantity: sweet.quantity,
+    });
+
+    toast.success(`Added ${quantity} ${sweet.name}(s) to cart!`);
+    setQuantity(1);
   };
 
   const handleEditSuccess = () => {
@@ -128,7 +151,7 @@ const SweetDetails: React.FC = () => {
                 className="w-full h-96 object-cover hover:scale-105 transition-transform duration-500"
               />
             </div>
-            
+
             {/* Admin Actions */}
             {isAdmin && (
               <div className="flex space-x-4">
@@ -205,7 +228,7 @@ const SweetDetails: React.FC = () => {
             {/* Purchase Section */}
             <div className="bg-white p-6 rounded-2xl shadow-lg">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Purchase</h3>
-              
+
               {/* Quantity Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -258,12 +281,13 @@ const SweetDetails: React.FC = () => {
                 variant="primary"
                 size="lg"
                 icon={FaShoppingCart}
-                onClick={handlePurchase}
-                disabled={sweet.quantity === 0 || purchasing || !isAuthenticated}
-                isLoading={purchasing}
+                onClick={handleAddToCart}
+                disabled={sweet.quantity === 0 || !isAuthenticated}
                 fullWidth
               >
-                {!isAuthenticated ? 'Login to Purchase' : sweet.quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+                {!isAuthenticated ? 'Login to Add to Cart' :
+                  sweet.quantity === 0 ? 'Out of Stock' :
+                    `Add to Cart (${getItemQuantity(sweet.id)} in cart)`}
               </Button>
 
               {!isAuthenticated && (

@@ -8,18 +8,20 @@ import SweetForm from '../../components/sweets/SweetForm/SweetForm';
 import { useSweets } from '../../contexts/SweetContext';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { useCart } from '../../contexts/CartContext';
+
 
 const Sweets: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { sweets, loading, categories, searchSweets, deleteSweet, refreshSweets } = useSweets();
   const { isAdmin, isAuthenticated } = useAuth();
-  
+
   const [showFilters, setShowFilters] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSweet, setEditingSweet] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  
+
   const [searchTerm, setSearchTerm] = useState(searchParams.get('name') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
   const [priceRange, setPriceRange] = useState({
@@ -27,6 +29,8 @@ const Sweets: React.FC = () => {
     max: searchParams.get('maxPrice') || '',
   });
   const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true');
+  const { addToCart, getItemQuantity } = useCart();
+  
 
   // Initialize search from URL params
   useEffect(() => {
@@ -36,7 +40,7 @@ const Sweets: React.FC = () => {
     if (searchParams.get('minPrice')) params.minPrice = Number(searchParams.get('minPrice'));
     if (searchParams.get('maxPrice')) params.maxPrice = Number(searchParams.get('maxPrice'));
     if (searchParams.get('inStock')) params.inStock = searchParams.get('inStock') === 'true';
-    
+
     if (Object.keys(params).length > 0) {
       searchSweets(params);
     }
@@ -50,7 +54,7 @@ const Sweets: React.FC = () => {
     if (priceRange.min) params.minPrice = priceRange.min;
     if (priceRange.max) params.maxPrice = priceRange.max;
     if (inStock) params.inStock = inStock;
-    
+
     setSearchParams(params);
   }, [searchTerm, selectedCategory, priceRange, inStock]);
 
@@ -81,7 +85,7 @@ const Sweets: React.FC = () => {
     if (priceRange.min) params.minPrice = priceRange.min;
     if (priceRange.max) params.maxPrice = priceRange.max;
     if (inStock) params.inStock = inStock;
-    
+
     searchSweets(params);
   };
 
@@ -110,6 +114,25 @@ const Sweets: React.FC = () => {
     refreshSweets();
   };
 
+  const handleAddToCart = (sweet: any) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to cart');
+      navigate('/login');
+      return;
+    }
+
+    addToCart({
+      id: sweet.id,
+      name: sweet.name,
+      price: sweet.price,
+      imageUrl: sweet.imageUrl,
+      category: sweet.category,
+      maxQuantity: sweet.quantity,
+    });
+
+    toast.success(`Added ${sweet.name} to cart!`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-amber-50 py-8">
       <div className="container mx-auto px-4">
@@ -119,7 +142,7 @@ const Sweets: React.FC = () => {
             Our Sweet Collection
           </h1>
           <p className="text-gray-600 text-center max-w-2xl mx-auto">
-            Discover our delicious range of sweets, candies, and treats. 
+            Discover our delicious range of sweets, candies, and treats.
             Freshly made with love and the finest ingredients.
           </p>
         </div>
@@ -148,7 +171,7 @@ const Sweets: React.FC = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="flex gap-2">
               <Button
                 variant={showFilters ? 'primary' : 'outline'}
@@ -291,10 +314,10 @@ const Sweets: React.FC = () => {
               </p>
             )}
           </div>
-          
+
           {isAdmin && (
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               icon={FaPlus}
               onClick={() => setShowAddModal(true)}
             >
@@ -357,7 +380,17 @@ const Sweets: React.FC = () => {
                     sweet={sweet}
                     onViewDetails={() => handleViewDetails(sweet.id)}
                   />
-                  
+
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleAddToCart(sweet)}
+                    disabled={sweet.quantity === 0 || !isAuthenticated}
+                    fullWidth
+                  >
+                    Add to Cart
+                  </Button>
+
                   {/* Admin Actions Overlay */}
                   {isAdmin && (
                     <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -387,8 +420,8 @@ const Sweets: React.FC = () => {
                 <p className="text-gray-500 mb-4">
                   {sweets.length === 1 ? 'Showing 1 sweet' : `Showing all ${sweets.length} sweets`}
                 </p>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="lg"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 >

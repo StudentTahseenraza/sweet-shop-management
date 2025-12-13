@@ -18,6 +18,7 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import AdminSweets from './pages/Admin/Sweets';
 import AdminUsers from './pages/Admin/Users';
 import AdminOrders from './pages/Admin/Orders';
+import { CartProvider } from './contexts/CartContext';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ 
@@ -83,6 +84,7 @@ function App() {
     <Router>
       <AuthProvider>
         <SweetProvider>
+          <CartProvider>
           <Toaster
             position="top-right"
             toastOptions={{
@@ -133,21 +135,21 @@ function App() {
             
             {/* Admin Routes */}
             // In App.tsx
-<Route path="admin/*" element={
-  <ProtectedRoute adminOnly>
-    <AdminLayout>
-      <Routes>
-        <Route index element={<AdminDashboard />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="sweets" element={<AdminSweets />} />
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="add-sweet" element={<AdminSweets />} />
-        <Route path="low-stock" element={<AdminSweets showLowStock />} />
-      </Routes>
-    </AdminLayout>
-  </ProtectedRoute>
-} />
+              <Route path="admin/*" element={
+                <ProtectedRoute adminOnly>
+                  <AdminLayout>
+                    <Routes>
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="sweets" element={<AdminSweets />} />
+                      <Route path="users" element={<AdminUsers />} />
+                      <Route path="orders" element={<AdminOrders />} />
+                      <Route path="add-sweet" element={<AdminSweets />} />
+                      <Route path="low-stock" element={<AdminSweets showLowStock />} />
+                    </Routes>
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
             
             {/* 404 Route */}
             <Route path="*" element={
@@ -162,6 +164,7 @@ function App() {
               </div>
             } />
           </Routes>
+          </CartProvider>
         </SweetProvider>
       </AuthProvider>
     </Router>
