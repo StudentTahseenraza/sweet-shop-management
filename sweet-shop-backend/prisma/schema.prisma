@@ -2,17 +2,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Production - MongoDB
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
+// Test - SQLite (only for test environment)
+datasource testDb {
+  provider = "sqlite"
+  url      = env("TEST_DATABASE_URL")
+}
+
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
   name      String
-  role      String   @default("CUSTOMER")  // Changed from enum to string
+  role      String   @default("CUSTOMER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -22,10 +29,8 @@ model User {
   @@map("users")
 }
 
-// Removed enum - SQLite doesn't support enums
-
 model Sweet {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String   @unique
   description String?
   category    String
@@ -43,28 +48,28 @@ model Sweet {
 }
 
 model Purchase {
-  id         String   @id @default(uuid())
-  sweetId    String
-  userId     String
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  sweetId    String   @db.ObjectId
+  userId     String   @db.ObjectId
   quantity   Int
   totalPrice Float
   createdAt  DateTime @default(now())
 
-  sweet      Sweet    @relation(fields: [sweetId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sweet      Sweet    @relation(fields: [sweetId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 
   @@map("purchases")
 }
 
 model Restock {
-  id        String   @id @default(uuid())
-  sweetId   String
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sweetId   String   @db.ObjectId
+  userId    String   @db.ObjectId
   quantity  Int
   createdAt DateTime @default(now())
 
-  sweet     Sweet    @relation(fields: [sweetId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sweet     Sweet    @relation(fields: [sweetId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("restocks")
 }
