@@ -1,4 +1,6 @@
 🍬 Sweet Shop Management System
+---------------------------------------------------------------------------------------------------------------
+
 A full-stack e-commerce platform for managing a sweet shop with admin dashboard, user management, inventory control, and online ordering system.
 ---------------------------------------------------------------------------------------------------------------
 ✨ Features
@@ -439,3 +441,4 @@ Loyalty program
 Advanced analytics
 
 Multi-vendor support
+
