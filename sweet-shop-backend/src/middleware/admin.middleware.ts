@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-/**
- * Admin role middleware
- */
 export const requireAdmin = (
   req: Request,
   res: Response,
@@ -18,7 +15,6 @@ export const requireAdmin = (
       });
     }
 
-    // Changed from UserRole.ADMIN to string 'ADMIN'
     if (user.role !== 'ADMIN') {
       return res.status(403).json({
         success: false,
@@ -35,9 +31,6 @@ export const requireAdmin = (
   }
 };
 
-/**
- * Check if user is admin (for conditional logic)
- */
 export const isAdmin = (req: Request): boolean => {
   return req.user?.role === 'ADMIN';
 };

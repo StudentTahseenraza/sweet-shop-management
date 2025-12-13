@@ -11,28 +11,23 @@ export interface ISweet {
   updatedAt: string;
 }
 
-export interface IUser {
-  id: string;
-  email: string;
+export interface ISweetCreate {
   name: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
+  description?: string;
+  category: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string;
 }
 
-export interface IPurchase {
-  id: string;
-  sweetId: string;
-  userId: string;
-  quantity: number;
-  totalPrice: number;
-  createdAt: string;
-  sweet: ISweet;
-}
-
-export interface ICartItem {
-  sweet: ISweet;
-  quantity: number;
+export interface ISweetUpdate {
+  name?: string;
+  description?: string;
+  category?: string;
+  price?: number;
+  quantity?: number;
+  imageUrl?: string;
+  isActive?: boolean;
 }
 
 export interface ISearchParams {
@@ -41,4 +36,12 @@ export interface ISearchParams {
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
+}
+
+export interface IPurchaseRequest {
+  quantity: number;
+}
+
+export interface IRestockRequest {
+  quantity: number;
 }

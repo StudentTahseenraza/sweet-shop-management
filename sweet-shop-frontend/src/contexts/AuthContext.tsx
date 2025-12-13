@@ -1,6 +1,8 @@
-﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import toast from "react-hot-toast";
+﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '../services/auth.service';
+import toast from 'react-hot-toast';
 
+// Define interface locally
 interface IUser {
   id: string;
   email: string;
@@ -18,6 +20,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  updateUser: (userData: IUser) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -37,82 +40,96 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-    
-    if (userData && token) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        console.error("Failed to parse user data from localStorage", error);
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+
+      if (token && storedUser) {
+        try {
+          // Verify token with backend
+          const isValid = await authService.verifyToken();
+          if (isValid) {
+            try {
+              const userData = JSON.parse(storedUser);
+              setUser(userData);
+            } catch {
+              // Invalid user data in localStorage
+              localStorage.removeItem('user');
+              localStorage.removeItem('token');
+            }
+          } else {
+            // Token expired or invalid
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+      setInitialized(true);
+    };
+
+    initAuth();
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email: string, password: string) => {
     try {
-      // Mock login - replace with actual API call
-      const mockUser: IUser = {
-        id: "1",
-        email,
-        name: "Test User",
-        role: email === "admin@sweetshop.com" ? "ADMIN" : "CUSTOMER",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      
-      localStorage.setItem("token", "mock-jwt-token");
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      setUser(mockUser);
-      toast.success("Login successful!");
+      setLoading(true);
+      const { user, token } = await authService.login({ email, password });
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      toast.success('Login successful!');
     } catch (error: any) {
-      toast.error(error.message || "Login failed");
+      toast.error(error.message || 'Login failed. Please check your credentials.');
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const register = async (name: string, email: string) => {
+  const register = async (name: string, email: string, password: string) => {
     try {
-      // Mock registration - replace with actual API call
-      const mockUser: IUser = {
-        id: "2",
-        email,
-        name,
-        role: "CUSTOMER",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      
-      localStorage.setItem("token", "mock-jwt-token");
-      localStorage.setItem("user", JSON.stringify(mockUser));
-      setUser(mockUser);
-      toast.success("Registration successful!");
+      setLoading(true);
+      const { user, token } = await authService.register({ name, email, password });
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      toast.success('Registration successful! Welcome to Sweet Shop!');
     } catch (error: any) {
-      toast.error(error.message || "Registration failed");
+      toast.error(error.message || 'Registration failed. Please try again.');
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    authService.logout();
     setUser(null);
-    toast.success("Logged out successfully");
+    toast.success('Logged out successfully');
+  };
+
+  const updateUser = (userData: IUser) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
   };
 
   const value = {
     user,
-    loading,
+    loading: loading || !initialized,
     login,
     register,
     logout,
     isAuthenticated: !!user,
-    isAdmin: user?.role === "ADMIN",
+    isAdmin: user?.role === 'ADMIN',
+    updateUser,
   };
 
   return (

@@ -1,13 +1,24 @@
-﻿import React from "react";
+﻿import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import AdminDashboard from './Dashboard';
+import AdminSweets from './Sweets';
+import AdminUsers from './Users';
+import AdminOrders from './Orders';
+import AdminLayout from '../../components/layout/AdminLayout/AdminLayout';
 
 const Admin: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-amber-50 py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-display gradient-text">Admin Panel</h1>
-        <p>Admin panel coming soon...</p>
-      </div>
-    </div>
+    <AdminLayout>
+      <Routes>
+        <Route index element={<AdminDashboard />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="sweets" element={<AdminSweets />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="add-sweet" element={<AdminSweets />} />
+        <Route path="low-stock" element={<AdminSweets showLowStock />} />
+      </Routes>
+    </AdminLayout>
   );
 };
 

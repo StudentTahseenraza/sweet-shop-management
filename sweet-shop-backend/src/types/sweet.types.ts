@@ -7,8 +7,8 @@ export interface ISweet {
   quantity: number;
   imageUrl?: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ISweetCreate {

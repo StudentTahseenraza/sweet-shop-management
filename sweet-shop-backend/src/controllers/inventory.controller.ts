@@ -4,14 +4,10 @@ import { purchaseSchema, restockSchema } from '../utils/validators';
 import { errorHandler } from '../utils/errorHandler';
 
 export class InventoryController {
-  /**
-   * Purchase sweet
-   */
   async purchaseSweet(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      // @ts-ignore - user is attached by auth middleware
-      const userId = req.user?.userId;
+      const userId = (req as any).user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -21,7 +17,6 @@ export class InventoryController {
         return;
       }
 
-      // Validate request body
       const validatedData = purchaseSchema.parse(req.body);
 
       const operation = {
@@ -42,14 +37,10 @@ export class InventoryController {
     }
   }
 
-  /**
-   * Restock sweet
-   */
   async restockSweet(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      // @ts-ignore - user is attached by auth middleware
-      const userId = req.user?.userId;
+      const userId = (req as any).user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -59,7 +50,6 @@ export class InventoryController {
         return;
       }
 
-      // Validate request body
       const validatedData = restockSchema.parse(req.body);
 
       const operation = {
@@ -80,13 +70,9 @@ export class InventoryController {
     }
   }
 
-  /**
-   * Get purchase history
-   */
   async getPurchaseHistory(req: Request, res: Response): Promise<void> {
     try {
-      // @ts-ignore - user is attached by auth middleware
-      const userId = req.user?.userId;
+      const userId = (req as any).user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -108,13 +94,9 @@ export class InventoryController {
     }
   }
 
-  /**
-   * Get restock history
-   */
   async getRestockHistory(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
       const restocks = await inventoryService.getSweetRestockHistory(id);
 
       res.status(200).json({
@@ -127,9 +109,6 @@ export class InventoryController {
     }
   }
 
-  /**
-   * Get low stock sweets
-   */
   async getLowStockSweets(req: Request, res: Response): Promise<void> {
     try {
       const threshold = req.query.threshold 

@@ -7,11 +7,7 @@ import {
 } from '../types/sweet.types';
 
 export class SweetsService {
-  /**
-   * Create a new sweet
-   */
   async createSweet(sweetData: ISweetCreate): Promise<ISweet> {
-    // Check if sweet with same name exists
     const existingSweet = await prisma.sweet.findUnique({
       where: { name: sweetData.name },
     });
@@ -20,57 +16,43 @@ export class SweetsService {
       throw new Error('Sweet with this name already exists');
     }
 
-    // Create sweet
     const sweet = await prisma.sweet.create({
       data: sweetData,
     });
 
-    return sweet;
+    return this.formatSweetDate(sweet);
   }
 
-  /**
-   * Get all sweets
-   */
   async getAllSweets(): Promise<ISweet[]> {
     const sweets = await prisma.sweet.findMany({
       where: { isActive: true },
       orderBy: { createdAt: 'desc' },
     });
 
-    return sweets;
+    return sweets.map(sweet => this.formatSweetDate(sweet));
   }
 
-  /**
-   * Get sweet by ID
-   */
   async getSweetById(id: string): Promise<ISweet | null> {
     const sweet = await prisma.sweet.findUnique({
       where: { id },
     });
 
-    return sweet;
+    if (!sweet) return null;
+
+    return this.formatSweetDate(sweet);
   }
 
-  /**
-   * Search sweets with filters
-   */
   async searchSweets(params: ISearchParams): Promise<ISweet[]> {
     const { name, category, minPrice, maxPrice, inStock } = params;
 
     const whereClause: any = { isActive: true };
 
     if (name) {
-      whereClause.name = {
-        contains: name,
-        mode: 'insensitive' as any,
-      };
+      whereClause.name = { contains: name };
     }
 
     if (category) {
-      whereClause.category = {
-        contains: category,
-        mode: 'insensitive' as any,
-      };
+      whereClause.category = { contains: category };
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -92,14 +74,10 @@ export class SweetsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return sweets;
+    return sweets.map(sweet => this.formatSweetDate(sweet));
   }
 
-  /**
-   * Update sweet
-   */
   async updateSweet(id: string, sweetData: ISweetUpdate): Promise<ISweet> {
-    // Check if sweet exists
     const existingSweet = await prisma.sweet.findUnique({
       where: { id },
     });
@@ -108,7 +86,6 @@ export class SweetsService {
       throw new Error('Sweet not found');
     }
 
-    // Check if name is being changed and if new name already exists
     if (sweetData.name && sweetData.name !== existingSweet.name) {
       const sweetWithSameName = await prisma.sweet.findUnique({
         where: { name: sweetData.name },
@@ -119,20 +96,15 @@ export class SweetsService {
       }
     }
 
-    // Update sweet
     const updatedSweet = await prisma.sweet.update({
       where: { id },
       data: sweetData,
     });
 
-    return updatedSweet;
+    return this.formatSweetDate(updatedSweet);
   }
 
-  /**
-   * Delete sweet (soft delete)
-   */
   async deleteSweet(id: string): Promise<void> {
-    // Check if sweet exists
     const existingSweet = await prisma.sweet.findUnique({
       where: { id },
     });
@@ -141,16 +113,12 @@ export class SweetsService {
       throw new Error('Sweet not found');
     }
 
-    // Soft delete by setting isActive to false
     await prisma.sweet.update({
       where: { id },
       data: { isActive: false },
     });
   }
 
-  /**
-   * Get sweet categories
-   */
   async getCategories(): Promise<string[]> {
     const categories = await prisma.sweet.findMany({
       distinct: ['category'],
@@ -159,6 +127,14 @@ export class SweetsService {
     });
 
     return categories.map(cat => cat.category);
+  }
+
+  private formatSweetDate(sweet: any): ISweet {
+    return {
+      ...sweet,
+      createdAt: sweet.createdAt.toISOString(),
+      updatedAt: sweet.updatedAt.toISOString()
+    };
   }
 }
 

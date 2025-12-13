@@ -4,15 +4,9 @@ import { registerSchema, loginSchema } from '../utils/validators';
 import { errorHandler } from '../utils/errorHandler';
 
 export class AuthController {
-  /**
-   * Register new user
-   */
   async register(req: Request, res: Response): Promise<void> {
     try {
-      // Validate request body
       const validatedData = registerSchema.parse(req.body);
-
-      // Register user
       const result = await authService.register(validatedData);
 
       res.status(201).json({
@@ -25,15 +19,9 @@ export class AuthController {
     }
   }
 
-  /**
-   * Login user
-   */
   async login(req: Request, res: Response): Promise<void> {
     try {
-      // Validate request body
       const validatedData = loginSchema.parse(req.body);
-
-      // Login user
       const result = await authService.login(validatedData);
 
       res.status(200).json({
@@ -46,13 +34,9 @@ export class AuthController {
     }
   }
 
-  /**
-   * Get user profile
-   */
   async getProfile(req: Request, res: Response): Promise<void> {
     try {
-      // @ts-ignore - user is attached by auth middleware
-      const userId = req.user?.userId;
+      const userId = (req as any).user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -81,9 +65,6 @@ export class AuthController {
     }
   }
 
-  /**
-   * Verify token
-   */
   async verifyToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization?.replace('Bearer ', '');

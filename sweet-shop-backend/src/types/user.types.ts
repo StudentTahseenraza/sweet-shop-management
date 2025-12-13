@@ -2,9 +2,9 @@ export interface IUser {
   id: string;
   email: string;
   name: string;
-  role: string;  // Changed from UserRole enum to string
-  createdAt: Date;
-  updatedAt: Date;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUserCreate {
@@ -26,9 +26,5 @@ export interface IAuthResponse {
 export interface IJWTPayload {
   userId: string;
   email: string;
-  role: string;  // Changed from UserRole enum to string
-}
-
-export interface IRequestWithUser extends Request {
-  user?: IJWTPayload;
+  role: string;
 }

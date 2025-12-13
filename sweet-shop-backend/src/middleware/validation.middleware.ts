@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError, ZodSchema } from 'zod';
 
-/**
- * Validation middleware factory
- */
 export const validate = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -28,9 +25,6 @@ export const validate = (schema: ZodSchema) => {
   };
 };
 
-/**
- * Query validation middleware
- */
 export const validateQuery = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {

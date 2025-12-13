@@ -11,11 +11,7 @@ import {
 } from '../types/user.types';
 
 export class AuthService {
-  /**
-   * Register a new user
-   */
   async register(userData: IUserCreate): Promise<IAuthResponse> {
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: userData.email },
     });
@@ -24,10 +20,8 @@ export class AuthService {
       throw new Error('User with this email already exists');
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         email: userData.email,
@@ -45,17 +39,19 @@ export class AuthService {
       },
     });
 
-    // Generate JWT token
     const token = this.generateToken(user);
 
-    return { user, token };
+    return { 
+      user: {
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString()
+      }, 
+      token 
+    };
   }
 
-  /**
-   * Login user
-   */
   async login(loginData: IUserLogin): Promise<IAuthResponse> {
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email: loginData.email },
     });
@@ -64,28 +60,25 @@ export class AuthService {
       throw new Error('Invalid credentials');
     }
 
-    // Verify password
     const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
 
     if (!isPasswordValid) {
       throw new Error('Invalid credentials');
     }
 
-    // Generate JWT token
     const token = this.generateToken(user);
-
-    // Return user without password
     const { password, ...userWithoutPassword } = user;
 
     return { 
-      user: userWithoutPassword as IUser, 
+      user: {
+        ...userWithoutPassword,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString()
+      } as IUser, 
       token 
     };
   }
 
-  /**
-   * Get user profile
-   */
   async getProfile(userId: string): Promise<IUser | null> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -99,12 +92,15 @@ export class AuthService {
       },
     });
 
-    return user;
+    if (!user) return null;
+
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString()
+    };
   }
 
-  /**
-   * Generate JWT token
-   */
   private generateToken(user: any): string {
     const payload: IJWTPayload = {
       userId: user.id,
@@ -112,7 +108,6 @@ export class AuthService {
       role: user.role,
     };
 
-    // Make sure secret is defined
     const secret = jwtConfig.secret;
     if (!secret) {
       throw new Error('JWT secret is not configured');
@@ -123,9 +118,6 @@ export class AuthService {
     });
   }
 
-  /**
-   * Verify JWT token
-   */
   verifyToken(token: string): IJWTPayload {
     try {
       const secret = jwtConfig.secret;

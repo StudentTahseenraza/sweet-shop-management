@@ -8,15 +8,9 @@ import {
 import { errorHandler } from '../utils/errorHandler';
 
 export class SweetsController {
-  /**
-   * Create new sweet
-   */
   async createSweet(req: Request, res: Response): Promise<void> {
     try {
-      // Validate request body
       const validatedData = sweetCreateSchema.parse(req.body);
-
-      // Create sweet
       const sweet = await sweetsService.createSweet(validatedData);
 
       res.status(201).json({
@@ -29,9 +23,6 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Get all sweets
-   */
   async getAllSweets(_: Request, res: Response): Promise<void> {
     try {
       const sweets = await sweetsService.getAllSweets();
@@ -46,13 +37,9 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Get sweet by ID
-   */
   async getSweetById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
       const sweet = await sweetsService.getSweetById(id);
 
       if (!sweet) {
@@ -72,14 +59,9 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Search sweets
-   */
   async searchSweets(req: Request, res: Response): Promise<void> {
     try {
-      // Validate query parameters
       const validatedParams = searchSchema.parse(req.query);
-
       const sweets = await sweetsService.searchSweets(validatedParams);
 
       res.status(200).json({
@@ -92,16 +74,10 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Update sweet
-   */
   async updateSweet(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
-      // Validate request body
       const validatedData = sweetUpdateSchema.parse(req.body);
-
       const sweet = await sweetsService.updateSweet(id, validatedData);
 
       res.status(200).json({
@@ -114,13 +90,9 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Delete sweet
-   */
   async deleteSweet(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
       await sweetsService.deleteSweet(id);
 
       res.status(200).json({
@@ -132,9 +104,6 @@ export class SweetsController {
     }
   }
 
-  /**
-   * Get categories
-   */
   async getCategories(_: Request, res: Response): Promise<void> {
     try {
       const categories = await sweetsService.getCategories();

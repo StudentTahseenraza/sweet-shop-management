@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-/**
- * 404 Not Found middleware
- */
 export const notFound = (req: Request, res: Response, next: NextFunction) => {
   res.status(404).json({
     success: false,
@@ -10,9 +7,6 @@ export const notFound = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-/**
- * Global error handler
- */
 export const errorHandler = (
   err: Error,
   req: Request,

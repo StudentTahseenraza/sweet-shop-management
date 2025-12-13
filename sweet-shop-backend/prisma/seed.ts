@@ -11,7 +11,6 @@ const prisma = new PrismaClient({
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Clear existing data
   await prisma.restock.deleteMany();
   await prisma.purchase.deleteMany();
   await prisma.sweet.deleteMany();
@@ -19,7 +18,6 @@ async function main() {
 
   console.log('🗑️  Cleared existing data');
 
-  // Create admin user
   const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin123!', 10);
   const admin = await prisma.user.create({
     data: {
@@ -30,7 +28,6 @@ async function main() {
     },
   });
 
-  // Create regular user
   const userPassword = await bcrypt.hash('User123!', 10);
   const user = await prisma.user.create({
     data: {
@@ -43,101 +40,195 @@ async function main() {
 
   console.log('👥 Created users');
 
-  // Create sweets
   const sweets = await prisma.sweet.createMany({
     data: [
       {
-        name: 'Chocolate Truffle',
-        description: 'Rich dark chocolate truffle with cocoa powder',
+        name: 'Dark Chocolate Truffle',
+        description: 'Premium dark chocolate truffle with cocoa dust',
         category: 'Chocolate',
-        price: 2.99,
-        quantity: 50,
+        price: 3.50,
+        quantity: 100,
         imageUrl: 'https://images.unsplash.com/photo-1623334044303-241021148842',
       },
       {
-        name: 'Strawberry Cheesecake',
-        description: 'Creamy cheesecake with fresh strawberry topping',
+        name: 'Milk Chocolate Bar',
+        description: 'Smooth milk chocolate bar with almonds',
+        category: 'Chocolate',
+        price: 4.25,
+        quantity: 150,
+        imageUrl: 'https://images.unsplash.com/photo-1606312619070-d48b4c652a52',
+      },
+      {
+        name: 'White Chocolate Hearts',
+        description: 'Sweet white chocolate in heart shapes',
+        category: 'Chocolate',
+        price: 2.99,
+        quantity: 200,
+        imageUrl: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75',
+      },
+      {
+        name: 'Chocolate Fudge Cake',
+        description: 'Rich chocolate fudge cake with ganache',
         category: 'Cake',
-        price: 4.99,
-        quantity: 25,
-        imageUrl: 'https://images.unsplash.com/photo-1624353365286-3f8d62dadadf',
+        price: 35.99,
+        quantity: 15,
+        imageUrl: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587',
       },
       {
-        name: 'Vanilla Cupcake',
-        description: 'Soft vanilla cupcake with buttercream frosting',
-        category: 'Cupcake',
-        price: 3.49,
-        quantity: 100,
-        imageUrl: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e',
-      },
-      {
-        name: 'Lemon Tart',
-        description: 'Tangy lemon filling in a buttery crust',
-        category: 'Tart',
-        price: 3.99,
-        quantity: 30,
-        imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7',
-      },
-      {
-        name: 'Macarons Assortment',
-        description: 'Assorted French macarons in various flavors',
-        category: 'Macaron',
-        price: 12.99,
-        quantity: 40,
-        imageUrl: 'https://images.unsplash.com/photo-1569929238190-869826b1bb05',
-      },
-      {
-        name: 'Red Velvet Cake',
-        description: 'Moist red velvet cake with cream cheese frosting',
+        name: 'Carrot Cake',
+        description: 'Moist carrot cake with cream cheese frosting',
         category: 'Cake',
-        price: 29.99,
-        quantity: 10,
-        imageUrl: 'https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7',
+        price: 28.50,
+        quantity: 12,
+        imageUrl: 'https://images.unsplash.com/photo-1596223575327-99a5be4faf1b',
       },
       {
-        name: 'Caramel Brownie',
-        description: 'Fudgy brownie with caramel swirls',
-        category: 'Brownie',
-        price: 2.49,
-        quantity: 75,
-        imageUrl: 'https://images.unsplash.com/photo-1624353365286-3f8d62dadadf',
-      },
-      {
-        name: 'Fruit Tart',
-        description: 'Fresh fruit tart with pastry cream',
-        category: 'Tart',
-        price: 4.49,
-        quantity: 20,
+        name: 'Cheesecake',
+        description: 'New York style cheesecake with berry compote',
+        category: 'Cake',
+        price: 32.99,
+        quantity: 18,
         imageUrl: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187',
       },
       {
-        name: 'Chocolate Chip Cookies',
-        description: 'Classic cookies with chocolate chips',
+        name: 'Double Chocolate Cookies',
+        description: 'Soft cookies with double chocolate chips',
         category: 'Cookie',
         price: 1.99,
-        quantity: 200,
+        quantity: 300,
         imageUrl: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e',
       },
       {
-        name: 'Rainbow Donut',
-        description: 'Colorful donut with sprinkles',
+        name: 'Oatmeal Raisin Cookies',
+        description: 'Healthy oatmeal cookies with raisins',
+        category: 'Cookie',
+        price: 1.75,
+        quantity: 250,
+        imageUrl: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35',
+      },
+      {
+        name: 'Red Velvet Cupcake',
+        description: 'Moist red velvet cupcake with cream cheese',
+        category: 'Cupcake',
+        price: 4.50,
+        quantity: 80,
+        imageUrl: 'https://images.unsplash.com/photo-1614707267537-b85aaf00c4b7',
+      },
+      {
+        name: 'Chocolate Cupcake',
+        description: 'Chocolate cupcake with chocolate frosting',
+        category: 'Cupcake',
+        price: 3.99,
+        quantity: 90,
+        imageUrl: 'https://images.unsplash.com/photo-1576618148400-f54bed99fcfd',
+      },
+      {
+        name: 'Glazed Donut',
+        description: 'Classic glazed donut',
         category: 'Donut',
-        price: 2.99,
-        quantity: 60,
+        price: 2.50,
+        quantity: 150,
         imageUrl: 'https://images.unsplash.com/photo-1551024506-0bccd828d307',
+      },
+      {
+        name: 'Chocolate Donut',
+        description: 'Chocolate frosted donut with sprinkles',
+        category: 'Donut',
+        price: 2.75,
+        quantity: 120,
+        imageUrl: 'https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6',
+      },
+      {
+        name: 'Croissant',
+        description: 'Buttery French croissant',
+        category: 'Pastry',
+        price: 3.50,
+        quantity: 100,
+        imageUrl: 'https://images.unsplash.com/photo-1555507036-ab794f27d2e9',
+      },
+      {
+        name: 'Pain au Chocolat',
+        description: 'Chocolate filled pastry',
+        category: 'Pastry',
+        price: 4.25,
+        quantity: 80,
+        imageUrl: 'https://images.unsplash.com/photo-1541783245831-57d6fb0926d3',
+      },
+      {
+        name: 'Gummy Bears',
+        description: 'Assorted fruit flavored gummy bears',
+        category: 'Candy',
+        price: 5.99,
+        quantity: 200,
+        imageUrl: 'https://images.unsplash.com/photo-1575224300306-1b8da36134ec',
+      },
+      {
+        name: 'Hard Candies',
+        description: 'Assorted hard candies in various flavors',
+        category: 'Candy',
+        price: 4.50,
+        quantity: 180,
+        imageUrl: 'https://images.unsplash.com/photo-1514517260015-2f1f338b5b8c',
+      },
+      {
+        name: 'Walnut Brownie',
+        description: 'Fudgy brownie with walnut pieces',
+        category: 'Brownie',
+        price: 3.25,
+        quantity: 110,
+        imageUrl: 'https://images.unsplash.com/photo-1605190557072-1f989f53c2d5',
+      },
+      {
+        name: 'Blondie',
+        description: 'White chocolate brownie',
+        category: 'Brownie',
+        price: 3.10,
+        quantity: 100,
+        imageUrl: 'https://images.unsplash.com/photo-1623334044303-241021148842',
+      },
+      {
+        name: 'Berry Tart',
+        description: 'Mixed berry tart with custard',
+        category: 'Tart',
+        price: 5.50,
+        quantity: 60,
+        imageUrl: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187',
+      },
+      {
+        name: 'Chocolate Tart',
+        description: 'Rich chocolate ganache tart',
+        category: 'Tart',
+        price: 5.75,
+        quantity: 55,
+        imageUrl: 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e',
+      },
+      {
+        name: 'Apple Pie',
+        description: 'Classic apple pie with cinnamon',
+        category: 'Pie',
+        price: 24.99,
+        quantity: 20,
+        imageUrl: 'https://images.unsplash.com/photo-1562007908-859b4ba9a1a2',
+      },
+      {
+        name: 'Pumpkin Pie',
+        description: 'Seasonal pumpkin pie with spices',
+        category: 'Pie',
+        price: 22.50,
+        quantity: 15,
+        imageUrl: 'https://images.unsplash.com/photo-1541783245831-57d6fb0926d3',
       },
     ],
   });
 
   console.log(`🍬 Created ${sweets.count} sweets`);
 
-  // Create some sample purchases
   const chocolateTruffle = await prisma.sweet.findFirst({
-    where: { name: 'Chocolate Truffle' },
+    where: { name: 'Dark Chocolate Truffle' },
   });
 
   const vanillaCupcake = await prisma.sweet.findFirst({
-    where: { name: 'Vanilla Cupcake' },
+    where: { name: 'Chocolate Cupcake' },
   });
 
   if (chocolateTruffle && vanillaCupcake) {
@@ -146,22 +237,27 @@ async function main() {
         {
           sweetId: chocolateTruffle.id,
           userId: user.id,
-          quantity: 2,
-          totalPrice: 2.99 * 2,
+          quantity: 5,
+          totalPrice: 3.50 * 5,
         },
         {
           sweetId: vanillaCupcake.id,
           userId: user.id,
           quantity: 3,
-          totalPrice: 3.49 * 3,
+          totalPrice: 3.99 * 3,
+        },
+        {
+          sweetId: chocolateTruffle.id,
+          userId: admin.id,
+          quantity: 10,
+          totalPrice: 3.50 * 10,
         },
       ],
     });
 
-    // Update quantities
     await prisma.sweet.update({
       where: { id: chocolateTruffle.id },
-      data: { quantity: chocolateTruffle.quantity - 2 },
+      data: { quantity: chocolateTruffle.quantity - 15 },
     });
 
     await prisma.sweet.update({
@@ -179,6 +275,9 @@ async function main() {
   console.log('👤 User credentials:');
   console.log(`   Email: ${user.email}`);
   console.log(`   Password: User123!`);
+  console.log('\n📊 Statistics:');
+  console.log(`   Total Sweets: ${sweets.count}`);
+  console.log(`   Categories: 10 categories`);
 }
 
 main()

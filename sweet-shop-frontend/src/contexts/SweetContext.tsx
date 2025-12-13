@@ -1,6 +1,8 @@
-﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import toast from "react-hot-toast";
+﻿import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { sweetService } from '../services/sweet.service';
+import toast from 'react-hot-toast';
 
+// Define interface locally
 interface ISweet {
   id: string;
   name: string;
@@ -21,6 +23,10 @@ interface SweetContextType {
   searchSweets: (params: any) => Promise<void>;
   refreshSweets: () => Promise<void>;
   purchaseSweet: (sweetId: string, quantity: number) => Promise<void>;
+  addSweet: (sweetData: any) => Promise<void>;
+  updateSweet: (id: string, sweetData: any) => Promise<void>;
+  deleteSweet: (id: string) => Promise<void>;
+  getSweetById: (id: string) => Promise<ISweet>;
 }
 
 const SweetContext = createContext<SweetContextType | undefined>(undefined);
@@ -28,7 +34,7 @@ const SweetContext = createContext<SweetContextType | undefined>(undefined);
 export const useSweets = () => {
   const context = useContext(SweetContext);
   if (!context) {
-    throw new Error("useSweets must be used within a SweetProvider");
+    throw new Error('useSweets must be used within a SweetProvider');
   }
   return context;
 };
@@ -39,153 +45,109 @@ interface SweetProviderProps {
 
 export const SweetProvider: React.FC<SweetProviderProps> = ({ children }) => {
   const [sweets, setSweets] = useState<ISweet[]>([]);
-  const [categories, setCategories] = useState<string[]>([
-    "Chocolate", "Cake", "Cupcake", "Tart", "Macaron", "Brownie", "Cookie", "Donut"
-  ]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const mockSweets: ISweet[] = [
-    {
-      id: "1",
-      name: "Chocolate Truffle",
-      description: "Rich dark chocolate truffle with cocoa powder",
-      category: "Chocolate",
-      price: 2.99,
-      quantity: 50,
-      imageUrl: "https://images.unsplash.com/photo-1623334044303-241021148842",
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      name: "Strawberry Cheesecake",
-      description: "Creamy cheesecake with fresh strawberry topping",
-      category: "Cake",
-      price: 4.99,
-      quantity: 25,
-      imageUrl: "https://images.unsplash.com/photo-1624353365286-3f8d62dadadf",
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "3",
-      name: "Vanilla Cupcake",
-      description: "Soft vanilla cupcake with buttercream frosting",
-      category: "Cupcake",
-      price: 3.49,
-      quantity: 100,
-      imageUrl: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e",
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "4",
-      name: "Lemon Tart",
-      description: "Tangy lemon filling in a buttery crust",
-      category: "Tart",
-      price: 3.99,
-      quantity: 30,
-      imageUrl: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-    {
-      id: "5",
-      name: "Macarons Assortment",
-      description: "Assorted French macarons in various flavors",
-      category: "Macaron",
-      price: 12.99,
-      quantity: 40,
-      imageUrl: "https://images.unsplash.com/photo-1569929238190-869826b1bb05",
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ];
+  const fetchSweets = async () => {
+    try {
+      setLoading(true);
+      const data = await sweetService.getAllSweets();
+      setSweets(data);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to fetch sweets');
+      setSweets([]); // Set empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await sweetService.getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      // Set default categories if API fails
+      setCategories(['Chocolate', 'Cake', 'Cupcake', 'Tart', 'Macaron', 'Brownie', 'Cookie', 'Donut']);
+    }
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setSweets(mockSweets);
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    fetchSweets();
+    fetchCategories();
   }, []);
 
   const searchSweets = async (params: any) => {
     try {
       setLoading(true);
-      // Mock search - filter based on params
-      let filtered = [...mockSweets];
-      
-      if (params.name) {
-        filtered = filtered.filter(sweet => 
-          sweet.name.toLowerCase().includes(params.name.toLowerCase())
-        );
-      }
-      
-      if (params.category) {
-        filtered = filtered.filter(sweet => 
-          sweet.category === params.category
-        );
-      }
-      
-      if (params.minPrice) {
-        filtered = filtered.filter(sweet => 
-          sweet.price >= params.minPrice
-        );
-      }
-      
-      if (params.maxPrice) {
-        filtered = filtered.filter(sweet => 
-          sweet.price <= params.maxPrice
-        );
-      }
-      
-      if (params.inStock) {
-        filtered = filtered.filter(sweet => 
-          sweet.quantity > 0
-        );
-      }
-      
-      setTimeout(() => {
-        setSweets(filtered);
-        setLoading(false);
-      }, 500);
-    } catch (error) {
-      toast.error("Search failed");
+      const data = await sweetService.searchSweets(params);
+      setSweets(data);
+    } catch (error: any) {
+      toast.error(error.message || 'Search failed');
+    } finally {
       setLoading(false);
     }
   };
 
   const refreshSweets = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setSweets(mockSweets);
-      setLoading(false);
-    }, 500);
+    await fetchSweets();
+    await fetchCategories();
   };
 
   const purchaseSweet = async (sweetId: string, quantity: number) => {
     try {
-      setLoading(true);
-      // Mock purchase
-      setTimeout(() => {
-        setSweets(prev => prev.map(sweet => 
-          sweet.id === sweetId 
-            ? { ...sweet, quantity: Math.max(0, sweet.quantity - quantity) }
-            : sweet
-        ));
-        setLoading(false);
-        toast.success("Purchase successful!");
-      }, 500);
+      await sweetService.purchaseSweet(sweetId, quantity);
+      await refreshSweets();
+      toast.success('Purchase successful!');
     } catch (error: any) {
-      toast.error(error.message || "Purchase failed");
-      setLoading(false);
+      toast.error(error.message || 'Purchase failed');
+      throw error;
+    }
+  };
+
+  const addSweet = async (sweetData: any) => {
+    try {
+      const newSweet = await sweetService.createSweet(sweetData);
+      setSweets(prev => [newSweet, ...prev]);
+      toast.success('Sweet added successfully!');
+      return newSweet;
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add sweet');
+      throw error;
+    }
+  };
+
+  const updateSweet = async (id: string, sweetData: any) => {
+    try {
+      const updatedSweet = await sweetService.updateSweet(id, sweetData);
+      setSweets(prev => prev.map(sweet => 
+        sweet.id === id ? updatedSweet : sweet
+      ));
+      toast.success('Sweet updated successfully!');
+      return updatedSweet;
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update sweet');
+      throw error;
+    }
+  };
+
+  const deleteSweet = async (id: string) => {
+    try {
+      await sweetService.deleteSweet(id);
+      setSweets(prev => prev.filter(sweet => sweet.id !== id));
+      toast.success('Sweet deleted successfully!');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete sweet');
+      throw error;
+    }
+  };
+
+  const getSweetById = async (id: string): Promise<ISweet> => {
+    try {
+      return await sweetService.getSweetById(id);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to fetch sweet');
+      throw error;
     }
   };
 
@@ -196,6 +158,10 @@ export const SweetProvider: React.FC<SweetProviderProps> = ({ children }) => {
     searchSweets,
     refreshSweets,
     purchaseSweet,
+    addSweet,
+    updateSweet,
+    deleteSweet,
+    getSweetById,
   };
 
   return (

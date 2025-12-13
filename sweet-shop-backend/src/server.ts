@@ -3,14 +3,11 @@ import prisma from './config/database';
 
 const PORT = process.env.PORT || 5000;
 
-// Function to start server
 const startServer = async () => {
   try {
-    // Test database connection
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    // Start server
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
       console.log(`📝 API Documentation: http://localhost:${PORT}/api-docs`);
@@ -22,7 +19,6 @@ const startServer = async () => {
   }
 };
 
-// Graceful shutdown
 const shutdown = async () => {
   console.log('🛑 Shutting down server...');
   
@@ -36,14 +32,11 @@ const shutdown = async () => {
   }
 };
 
-// Handle termination signals
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
-// Start the server
 startServer();
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (error: Error) => {
   console.error('❌ Unhandled Promise Rejection:', error);
   shutdown();

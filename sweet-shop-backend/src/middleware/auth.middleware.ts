@@ -10,9 +10,6 @@ declare global {
   }
 }
 
-/**
- * Authentication middleware
- */
 export const authenticate = async(
   req: Request,
   res: Response,
@@ -29,11 +26,7 @@ export const authenticate = async(
     }
 
     const token = authHeader.split(' ')[1];
-
-    // Verify token
     const decoded = authService.verifyToken(token);
-
-    // Attach user to request
     req.user = decoded;
 
     next();
@@ -45,9 +38,6 @@ export const authenticate = async(
   }
 };
 
-/**
- * Check if user is authenticated (optional)
- */
 export const optionalAuthenticate = async (
   req: Request,
   res: Response,
@@ -64,7 +54,6 @@ export const optionalAuthenticate = async (
 
     next();
   } catch (error) {
-    // If token is invalid, continue without authentication
     next();
   }
 };
