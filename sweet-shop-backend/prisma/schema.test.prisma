@@ -2,10 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// Production - MongoDB
-datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+// Test - SQLite (only for test environment)
+datasource testDb {
+  provider = "sqlite"
+  url      = env("TEST_DATABASE_URL")
 }
 
 model User {

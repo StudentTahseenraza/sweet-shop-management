@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "build": "npx prisma generate && tsc",
-    "start": "node dist/server.js",
+    "build:test": "cp prisma/schema.test.prisma prisma/schema.prisma && npx prisma generate && tsc",
+    "test": "npm run build:test && jest",
     "render-build": "npm install --include=dev && npm run build",
-    "test": "jest",
     "seed": "ts-node prisma/seed.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
