@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
+    "start": "node dist/server.js",
     "build": "npx prisma generate && tsc",
     "build:test": "cp prisma/schema.test.prisma prisma/schema.prisma && npx prisma generate && tsc",
     "test": "npm run build:test && jest",
