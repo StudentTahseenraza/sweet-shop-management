@@ -12,7 +12,11 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-  origin: '*',
+   origin: [
+    'https://sweet-shop-management-iota.vercel.app', // Your Vercel frontend
+    'http://localhost:3000', // Local development
+    'http://localhost:5173' // Vite default
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
