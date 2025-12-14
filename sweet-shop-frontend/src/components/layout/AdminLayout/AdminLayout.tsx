@@ -11,7 +11,8 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaHome // Added Home icon
 } from 'react-icons/fa';
 import { useAuth } from '../../../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -21,7 +22,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [lowStockCount, setLowStockCount] = useState(5); // Mock data
+  const [lowStockCount] = useState(5); // Mock data
 
   const handleLogout = () => {
     logout();
@@ -115,6 +116,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 )}
               </Link>
             ))}
+
+            {/* Home Button - Added here */}
+            <Link
+              to="/"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors mt-4 border-t border-gray-800 pt-4"
+            >
+              <FaHome className="w-5 h-5" />
+              <span className="flex-1">Go to Home</span>
+            </Link>
           </nav>
 
           {/* Logout Button */}
@@ -144,6 +155,15 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               </div>
               
               <div className="flex items-center space-x-4">
+                {/* Home Button in Header */}
+                <Link
+                  to="/"
+                  className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  <FaHome className="w-4 h-4" />
+                  <span className="hidden md:inline">Go to Home</span>
+                </Link>
+
                 {/* Notifications */}
                 <div className="relative">
                   <button className="p-2 text-gray-600 hover:text-gray-900">

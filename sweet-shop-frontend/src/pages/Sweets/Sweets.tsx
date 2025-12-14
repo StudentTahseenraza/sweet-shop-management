@@ -10,12 +10,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useCart } from '../../contexts/CartContext';
 
-
 const Sweets: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { sweets, loading, categories, searchSweets, deleteSweet, refreshSweets } = useSweets();
   const { isAdmin, isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
 
   const [showFilters, setShowFilters] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -29,10 +29,7 @@ const Sweets: React.FC = () => {
     max: searchParams.get('maxPrice') || '',
   });
   const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true');
-  const { addToCart, getItemQuantity } = useCart();
-  
 
-  // Initialize search from URL params
   useEffect(() => {
     const params: any = {};
     if (searchParams.get('name')) params.name = searchParams.get('name');
@@ -46,7 +43,6 @@ const Sweets: React.FC = () => {
     }
   }, []);
 
-  // Update URL when filters change
   useEffect(() => {
     const params: any = {};
     if (searchTerm) params.name = searchTerm;
@@ -104,6 +100,7 @@ const Sweets: React.FC = () => {
       setDeleteConfirm(null);
       toast.success('Sweet deleted successfully!');
     } catch (error) {
+      console.error(error);
       // Error handled in context
     }
   };
@@ -379,17 +376,8 @@ const Sweets: React.FC = () => {
                   <SweetCard
                     sweet={sweet}
                     onViewDetails={() => handleViewDetails(sweet.id)}
+                    onAddToCart={() => handleAddToCart(sweet)} // Pass the handler to SweetCard
                   />
-
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => handleAddToCart(sweet)}
-                    disabled={sweet.quantity === 0 || !isAuthenticated}
-                    fullWidth
-                  >
-                    Add to Cart
-                  </Button>
 
                   {/* Admin Actions Overlay */}
                   {isAdmin && (

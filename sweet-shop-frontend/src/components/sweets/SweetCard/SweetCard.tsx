@@ -2,22 +2,26 @@
 import { useAuth } from "../../../contexts/AuthContext";
 import { useSweets } from "../../../contexts/SweetContext";
 import Button from "../../common/Button/Button";
+
 interface SweetCardProps {
   sweet: any;
   onViewDetails?: () => void;
+  onAddToCart?: () => void; // Added this prop
 }
 
 const SweetCard: React.FC<SweetCardProps> = ({ 
   sweet, 
-  onViewDetails
+  onViewDetails,
+  onAddToCart // Added this prop
 }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { purchaseSweet } = useSweets();
 
   const handlePurchase = async () => {
     try {
       await purchaseSweet(sweet.id, 1);
     } catch (error) {
+      console.error(error);
       // Error handled in context
     }
   };
@@ -61,11 +65,11 @@ const SweetCard: React.FC<SweetCardProps> = ({
             <Button
               variant="primary"
               size="sm"
-              onClick={handlePurchase}
+              onClick={onAddToCart || handlePurchase} // Use onAddToCart if provided, otherwise use handlePurchase
               disabled={sweet.quantity === 0}
               className="flex-1"
             >
-              Purchase
+              {onAddToCart ? "Add to Cart" : "Purchase"}
             </Button>
           )}
 

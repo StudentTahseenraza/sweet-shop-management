@@ -9,7 +9,8 @@ import {
   FaCandyCane,
   FaArrowUp,
   FaArrowDown,
-  FaHistory
+  FaHistory,
+  FaHome // Added Home icon
 } from 'react-icons/fa';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
@@ -27,7 +28,6 @@ import {
 import { useSweets } from '../../contexts/SweetContext';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/common/Button/Button';
-// import api from '../../services/api';
 
 ChartJS.register(
   CategoryScale,
@@ -72,26 +72,21 @@ const AdminDashboard: React.FC = () => {
     try {
       setLoadingStats(true);
       
-      // In a real app, you would fetch from your API
-      // For now, we'll calculate from local data
-      
       const categories = new Set(sweets.map(s => s.category));
       const lowStock = sweets.filter(s => s.quantity <= 10).length;
       const revenue = sweets.reduce((acc, sweet) => {
-        // Mock revenue calculation
         return acc + (sweet.price * (100 - sweet.quantity));
       }, 0);
       
       setStats({
         totalSweets: sweets.length,
-        totalUsers: 150, // Mock data
+        totalUsers: 150,
         totalRevenue: revenue,
         lowStockItems: lowStock,
-        todaySales: 1250, // Mock data
+        todaySales: 1250,
         activeCategories: categories.size
       });
 
-      // Mock recent purchases
       setRecentPurchases([
         { id: 1, customer: 'John Doe', item: 'Chocolate Truffle', quantity: 5, total: 14.95, time: '10:30 AM' },
         { id: 2, customer: 'Jane Smith', item: 'Strawberry Cheesecake', quantity: 2, total: 9.98, time: '11:15 AM' },
@@ -174,18 +169,30 @@ const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
             <p className="text-gray-600">Welcome back, {user?.name}! 👋</p>
           </div>
-          <div className="text-sm text-gray-500">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button 
+                variant="primary" 
+                icon={FaHome}
+                className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+              >
+                <span className="hidden md:inline">Go to Home</span>
+                <span className="md:hidden">Home</span>
+              </Button>
+            </Link>
+            <div className="text-sm text-gray-500">
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -396,6 +403,14 @@ const AdminDashboard: React.FC = () => {
               <Button variant="outline" fullWidth className="text-red-600 border-red-200 hover:bg-red-50">
                 <FaExclamationTriangle className="mr-2" />
                 Low Stock Alert ({stats.lowStockItems})
+              </Button>
+            </Link>
+
+            {/* Home Button in Quick Actions */}
+            <Link to="/">
+              <Button variant="outline" fullWidth className="mt-4 border-primary-500 text-primary-600 hover:bg-primary-50">
+                <FaHome className="mr-2" />
+                Go to Home Page
               </Button>
             </Link>
           </div>

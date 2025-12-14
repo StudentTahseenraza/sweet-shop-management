@@ -16,7 +16,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search...",
   className = "",
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
+  const [setIsFocused] = useState(false);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

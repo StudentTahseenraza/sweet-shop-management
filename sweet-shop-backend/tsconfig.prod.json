@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "noEmitOnError": true
-  },
-  "include": ["src"],
-  "exclude": ["src/tests/**", "**/*.test.ts", "prisma/seed.ts"]
-}

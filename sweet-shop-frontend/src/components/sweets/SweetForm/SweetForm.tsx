@@ -25,7 +25,7 @@ interface SweetFormProps {
 }
 
 const SweetForm: React.FC<SweetFormProps> = ({ sweet, onSuccess, onCancel }) => {
-  const { createSweet, updateSweet, categories } = useSweets();
+  const { addSweet, updateSweet, categories } = useSweets(); // Changed from createSweet to addSweet
   const [isLoading, setIsLoading] = useState(false);
   const [isRestocking, setIsRestocking] = useState(false);
 
@@ -77,7 +77,6 @@ const SweetForm: React.FC<SweetFormProps> = ({ sweet, onSuccess, onCancel }) => 
       setIsLoading(true);
       
       if (isRestocking) {
-        // For restocking, we would add to existing quantity
         const updatedQuantity = sweet.quantity + data.quantity;
         await updateSweet(sweet.id, { ...sweet, quantity: updatedQuantity });
         toast.success(`Restocked ${data.quantity} units successfully!`);
@@ -85,7 +84,7 @@ const SweetForm: React.FC<SweetFormProps> = ({ sweet, onSuccess, onCancel }) => 
         await updateSweet(sweet.id, data);
         toast.success('Sweet updated successfully!');
       } else {
-        await createSweet(data);
+        await addSweet(data); // Changed from createSweet to addSweet
         toast.success('Sweet created successfully!');
       }
       
@@ -101,7 +100,6 @@ const SweetForm: React.FC<SweetFormProps> = ({ sweet, onSuccess, onCancel }) => 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In real app, upload to cloud storage and get URL
       const imageUrl = URL.createObjectURL(file);
       setValue('imageUrl', imageUrl);
     }
